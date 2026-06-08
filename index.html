@@ -162,46 +162,41 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
 .empty{color:var(--text3);font-size:11px;font-style:italic;padding:20px;}
 .two-col{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
 
-/* ═══════════ DARK THEME (Operational Goals) ═══════════ */
-.dark-wrap{
-  --dbg:#1a1714; --dbg2:#221f1b; --dsurface:#28241f; --dsurface2:#332e28;
-  --dborder:#3d3830; --dtext:#f0ebe3; --dtext2:#b8b0a6; --dmuted:#6e6860;
-  --daccent:#7c5ef9; --dgreen:#00b37e; --dyellow:#f59e0b; --dorange:#f97316; --dred:#ef4444;
-  background:var(--dbg);color:var(--dtext);font-family:'Plus Jakarta Sans',sans-serif;
-  border-radius:12px;padding:28px;
-}
-.dark-tabs{display:flex;background:var(--dsurface);border:1px solid var(--dborder);border-radius:10px;padding:3px;gap:3px;width:fit-content;margin-bottom:20px;}
-.dark-tab{padding:6px 18px;border-radius:7px;font-size:12px;font-weight:700;cursor:pointer;color:var(--dmuted);border:none;background:none;font-family:'Plus Jakarta Sans',sans-serif;transition:all .2s;}
-.dark-tab.active{background:linear-gradient(135deg,#7c5ef9,#9b82ff);color:#fff;box-shadow:0 2px 8px rgba(124,94,249,0.35);}
-.dark-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:24px;}
-.dark-kpi{background:var(--dsurface);border:1px solid var(--dborder);border-radius:12px;padding:16px 18px;position:relative;overflow:hidden;}
-.dark-kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;background:var(--dk-color,var(--daccent));}
-.dark-kpi-label{font-size:10px;font-weight:700;color:var(--dmuted);text-transform:uppercase;letter-spacing:0.07em;margin-bottom:8px;}
-.dark-kpi-val{font-size:28px;font-weight:900;letter-spacing:-0.04em;color:var(--dk-color,var(--dtext));line-height:1;margin-bottom:3px;}
-.dark-kpi-sub{font-size:11px;color:var(--dmuted);font-weight:500;}
-.dark-filter-row{display:flex;align-items:center;gap:10px;margin-bottom:20px;flex-wrap:wrap;}
+/* ═══════════ OPERATIONAL GOALS — slightly darker light theme ═══════════ */
+.dark-wrap{background:#e8eaf2;padding:0;border-radius:0;}
+.dark-kpi-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.dark-kpi{background:var(--surface);border:1px solid var(--border2);border-radius:10px;padding:16px 18px;position:relative;overflow:hidden;transition:box-shadow 0.15s;}
+.dark-kpi:hover{box-shadow:0 2px 10px rgba(0,0,0,0.08);}
+.dark-kpi::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--dk-color,var(--accent));}
+.dark-kpi-label{color:var(--text3);font-size:10px;text-transform:uppercase;letter-spacing:0.8px;font-weight:600;margin-bottom:8px;}
+.dark-kpi-val{font-size:28px;font-weight:800;color:var(--dk-color,var(--text));line-height:1;margin-bottom:3px;}
+.dark-kpi-sub{font-size:11px;color:var(--text3);}
+.dark-tabs{display:flex;background:var(--surface);border:1px solid var(--border2);border-radius:8px;padding:3px;gap:3px;width:fit-content;margin-bottom:20px;}
+.dark-tab{padding:6px 18px;border-radius:6px;font-size:12px;font-weight:600;cursor:pointer;color:var(--text3);border:none;background:none;font-family:'Inter',sans-serif;transition:all .2s;}
+.dark-tab.active{background:var(--accent);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,0.25);}
+.dark-filter-row{display:flex;align-items:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;}
 .dark-search-wrap{position:relative;}
-.dark-search{padding:8px 12px 8px 34px;background:var(--dsurface);border:1px solid var(--dborder);border-radius:9px;color:var(--dtext);font-size:12px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:500;outline:none;width:220px;transition:border-color .2s;}
-.dark-search:focus{border-color:var(--daccent);}
-.dark-search::placeholder{color:var(--dmuted);}
-.dark-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--dmuted);pointer-events:none;}
-.dark-fbtn{padding:7px 13px;background:var(--dsurface);border:1.5px solid var(--dborder);border-radius:9px;color:var(--dtext2);font-size:11px;font-family:'Plus Jakarta Sans',sans-serif;font-weight:700;cursor:pointer;transition:all .2s;}
-.dark-fbtn.don{background:rgba(0,179,126,0.1);border-color:var(--dgreen);color:var(--dgreen);}
-.dark-fbtn.yon{background:rgba(245,158,11,0.1);border-color:var(--dyellow);color:var(--dyellow);}
-.dark-fbtn.ron{background:rgba(239,68,68,0.1);border-color:var(--dred);color:var(--dred);}
-.dark-fbtn.on{opacity:1;box-shadow:0 0 0 2px currentColor;}
-.op-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px;}
-.op-card{background:var(--dsurface);border:1.5px solid var(--dborder);border-radius:12px;padding:16px;transition:all .2s;}
-.op-card:hover{border-color:#4a4540;box-shadow:0 4px 16px rgba(0,0,0,0.2);}
-.op-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.op-card-name{font-size:13px;font-weight:800;color:var(--dtext);}
-.op-card-po{font-size:10px;color:var(--dmuted);font-weight:600;margin-top:2px;}
-.op-progress-row{display:flex;align-items:center;gap:10px;margin-bottom:8px;}
-.op-nums{font-size:22px;font-weight:900;letter-spacing:-0.03em;}
-.op-bar-bg{height:6px;background:var(--dbg2);border-radius:3px;overflow:hidden;margin-bottom:6px;}
+.dark-search{background:var(--surface);border:1px solid var(--border2);color:var(--text);padding:7px 12px 7px 34px;border-radius:7px;font-size:12px;font-family:'Inter',sans-serif;outline:none;width:220px;transition:border-color .2s;}
+.dark-search:focus{border-color:var(--accent);}
+.dark-search::placeholder{color:var(--text3);}
+.dark-search-icon{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;}
+.dark-fbtn{padding:6px 14px;background:var(--surface);border:1px solid var(--border2);border-radius:7px;color:var(--text2);font-size:11px;font-family:'Inter',sans-serif;font-weight:600;cursor:pointer;transition:all .2s;}
+.dark-fbtn.don{background:var(--green-dim);border-color:var(--green-border);color:var(--green);}
+.dark-fbtn.yon{background:var(--yellow-dim);border-color:var(--yellow-border);color:var(--yellow);}
+.dark-fbtn.ron{background:var(--red-dim);border-color:var(--red-border);color:var(--red);}
+.dark-fbtn.on{box-shadow:0 0 0 2px currentColor;}
+.op-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:10px;}
+.op-card{background:var(--surface);border:1px solid var(--border);border-radius:10px;padding:16px;transition:box-shadow .15s;}
+.op-card:hover{box-shadow:0 2px 10px rgba(0,0,0,0.08);}
+.op-card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.op-card-name{font-size:13px;font-weight:700;color:var(--text);}
+.op-card-po{font-size:10px;color:var(--text3);font-weight:500;margin-top:2px;}
+.op-progress-row{display:flex;align-items:baseline;gap:6px;margin-bottom:8px;}
+.op-nums{font-size:24px;font-weight:800;letter-spacing:-0.03em;}
+.op-bar-bg{height:6px;background:var(--border);border-radius:3px;overflow:hidden;margin-bottom:6px;}
 .op-bar-fill{height:100%;border-radius:3px;transition:width .8s ease;}
-.op-footer{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--dmuted);font-weight:600;}
-.shim{background:linear-gradient(90deg,var(--dborder) 25%,var(--dsurface2) 50%,var(--dborder) 75%);background-size:400% 100%;animation:shimmer 1.4s ease infinite;border-radius:6px;height:12px;}
+.op-footer{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:var(--text3);font-weight:600;}
+.shim{background:linear-gradient(90deg,var(--border) 25%,var(--surface2) 50%,var(--border) 75%);background-size:400% 100%;animation:shimmer 1.4s ease infinite;border-radius:6px;height:12px;}
 @keyframes shimmer{0%{background-position:100%}100%{background-position:-100%}}
 
 /* ═══════════ POD PERFORMANCE (combined) ═══════════ */
@@ -312,8 +307,8 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
   <div class="dark-wrap">
     <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px">
       <div>
-        <div style="font-size:22px;font-weight:900;color:#f0ebe3;letter-spacing:-0.03em;font-family:'Plus Jakarta Sans',sans-serif">Operational Goals</div>
-        <div style="font-size:12px;color:#6e6860;font-weight:500;margin-top:3px;font-family:'Plus Jakarta Sans',sans-serif">Content output — target (from sheet) vs. actual delivered (from Notion)</div>
+        <div class="section-title" style="margin-bottom:4px">Content Output</div>
+        <div style="font-size:11px;color:var(--text3);font-weight:500">Target vs. actual delivered this cycle — pulled live from Notion</div>
       </div>
       <div class="dark-tabs">
         <button class="dark-tab active" onclick="switchOpsTab('accelerate',this)">Accelerate</button>
@@ -334,9 +329,9 @@ body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-
       <button class="dark-fbtn don" id="ofg" onclick="toggleOpsFilter('green',this)">🟢 On Target</button>
       <button class="dark-fbtn yon" id="ofy" onclick="toggleOpsFilter('yellow',this)">🟡 Partial</button>
       <button class="dark-fbtn ron" id="ofr" onclick="toggleOpsFilter('red',this)">🔴 Behind</button>
-      <span style="font-size:11px;font-weight:700;color:#6e6860;margin-left:auto" id="opsBadge"></span>
+      <span style="font-size:11px;font-weight:700;color:var(--text3);margin-left:auto" id="opsBadge"></span>
     </div>
-    <div class="op-grid" id="opsGrid"><div style="color:#6e6860;font-size:12px;font-weight:600;grid-column:span 3;padding:20px 0">Loading Notion data…</div></div>
+    <div class="op-grid" id="opsGrid"><div style="color:var(--text3);font-size:12px;font-weight:600;grid-column:span 3;padding:20px 0">Loading Notion data…</div></div>
   </div>
 </div>
 
@@ -661,7 +656,7 @@ function getOpsColor(c,d){
   if(!d||d.manual)return'gray';const t=getOpTarget(c);if(t<=0)return'gray';
   const pct=(d.delivered/t)*100;if(pct>=90)return'green';if(pct>=50)return'yellow';return'red';
 }
-function getOpsHex(col){return{green:'#00b37e',yellow:'#f59e0b',red:'#ef4444',gray:'#6e6860'}[col]||'#6e6860';}
+function getOpsHex(col){return{green:'var(--green)',yellow:'var(--yellow)',red:'var(--red)',gray:'var(--text3)'}[col]||'var(--text3)';}
 
 function switchOpsTab(tab,btn){
   OPS_TAB=tab;opsColorFilter=null;
@@ -693,30 +688,30 @@ function renderOpsKPIs(){
   const tgt=wd.reduce((s,c)=>s+getOpTarget(c),0);
   const avg=tgt>0?Math.round((del/tgt)*100):0;
   document.getElementById('opsKPIs').innerHTML=
-    `<div class="dark-kpi" style="--dk-color:#7c5ef9"><div class="dark-kpi-label">Total Clients</div><div class="dark-kpi-val">${clients.length}</div><div class="dark-kpi-sub">${clients.filter(c=>getOpTarget(c)>0).length} with targets</div></div>`+
-    `<div class="dark-kpi" style="--dk-color:#00b37e"><div class="dark-kpi-label">On Target</div><div class="dark-kpi-val">${onTarget}</div><div class="dark-kpi-sub">≥90% of goal</div></div>`+
-    `<div class="dark-kpi" style="--dk-color:#ef4444"><div class="dark-kpi-label">Behind</div><div class="dark-kpi-val">${behind}</div><div class="dark-kpi-sub"><50% of goal</div></div>`+
-    `<div class="dark-kpi" style="--dk-color:#f59e0b"><div class="dark-kpi-label">Overall Output</div><div class="dark-kpi-val">${avg}%</div><div class="dark-kpi-sub">${del} of ${tgt} posts</div></div>`;
+    `<div class="dark-kpi" style="--dk-color:var(--blue)"><div class="dark-kpi-label">Total Clients</div><div class="dark-kpi-val">${clients.length}</div><div class="dark-kpi-sub">${clients.filter(c=>getOpTarget(c)>0).length} with targets</div></div>`+
+    `<div class="dark-kpi" style="--dk-color:var(--green)"><div class="dark-kpi-label">On Target</div><div class="dark-kpi-val">${onTarget}</div><div class="dark-kpi-sub">≥90% of goal</div></div>`+
+    `<div class="dark-kpi" style="--dk-color:var(--red)"><div class="dark-kpi-label">Behind</div><div class="dark-kpi-val">${behind}</div><div class="dark-kpi-sub"><50% of goal</div></div>`+
+    `<div class="dark-kpi" style="--dk-color:var(--yellow)"><div class="dark-kpi-label">Overall Output</div><div class="dark-kpi-val">${avg}%</div><div class="dark-kpi-sub">${del} of ${tgt} posts</div></div>`;
 }
 function renderOpsGrid(){renderOpsKPIs();applyOpsFilters();}
 function renderOpsCards(clients){
   const badge=document.getElementById('opsBadge');
   if(badge)badge.textContent=clients.length+' client'+(clients.length!==1?'s':'');
   const grid=document.getElementById('opsGrid');
-  if(!clients.length){grid.innerHTML='<div style="color:#6e6860;font-size:12px;font-weight:600;padding:20px 0">No clients match.</div>';return;}
+  if(!clients.length){grid.innerHTML='<div style="color:var(--text3);font-size:12px;font-weight:600;padding:20px 0">No clients match.</div>';return;}
   grid.innerHTML=clients.map(c=>{
     const d=NOTION_DATA[c.name],col=getOpsColor(c,d),hex=getOpsHex(col);
     const delivered=d?.delivered||0,target=getOpTarget(c),pct=target>0?Math.min(Math.round((delivered/target)*100),999):null;
     const poColor=PO_COLORS[c.po]||'#6e6860';
     if(!d)return`<div class="op-card"><div class="op-card-header"><div><div class="op-card-name">${c.name}</div><div class="op-card-po">PO: ${c.po||'—'}</div></div></div><div class="shim" style="width:60%;margin-bottom:8px"></div><div class="shim" style="width:100%;height:6px"></div></div>`;
-    if(c.manual||!c.dbId)return`<div class="op-card"><div class="op-card-header"><div><div class="op-card-name">${c.name}</div><div class="op-card-po">PO: ${c.po||'—'}</div></div><span style="font-size:10px;font-weight:700;color:#6e6860;background:rgba(110,104,96,0.15);padding:3px 8px;border-radius:20px">Manual</span></div><div style="font-size:11px;color:#6e6860;margin-top:8px">Tracked manually</div></div>`;
-    if(target<=0)return`<div class="op-card"><div class="op-card-header"><div><div class="op-card-name">${c.name}</div><div class="op-card-po">PO: ${c.po||'—'}</div></div><span style="font-size:10px;font-weight:700;color:#6e6860;background:rgba(110,104,96,0.15);padding:3px 8px;border-radius:20px">TBD</span></div><div style="font-size:11px;color:#6e6860;margin-top:8px">Target not defined</div></div>`;
+    if(c.manual||!c.dbId)return`<div class="op-card"><div class="op-card-header"><div><div class="op-card-name">${c.name}</div><div class="op-card-po">PO: ${c.po||'—'}</div></div><span style="font-size:10px;font-weight:700;color:var(--text3);background:var(--surface2);padding:3px 8px;border-radius:20px">Manual</span></div><div style="font-size:11px;color:var(--text3);margin-top:8px">Tracked manually</div></div>`;
+    if(target<=0)return`<div class="op-card"><div class="op-card-header"><div><div class="op-card-name">${c.name}</div><div class="op-card-po">PO: ${c.po||'—'}</div></div><span style="font-size:10px;font-weight:700;color:var(--text3);background:var(--surface2);padding:3px 8px;border-radius:20px">TBD</span></div><div style="font-size:11px;color:var(--text3);margin-top:8px">Target not defined</div></div>`;
     return`<div class="op-card" style="border-color:${col!=='gray'?hex+'33':''}">
       <div class="op-card-header">
-        <div><div class="op-card-name">${c.name}</div><div class="op-card-po" style="color:${poColor}">PO: ${c.po||'—'} <span style="color:#6e6860">· ${OPS_TAB==='dfy'?'DFY':'ACC'}</span></div></div>
+        <div><div class="op-card-name">${c.name}</div><div class="op-card-po" style="color:${poColor}">PO: ${c.po||'—'} <span style="color:var(--text3)">· ${OPS_TAB==='dfy'?'DFY':'ACC'}</span></div></div>
         <span style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;background:${hex}18;color:${hex}">${pct!==null?pct+'%':'—'}</span>
       </div>
-      <div class="op-progress-row"><div class="op-nums" style="color:${hex}">${delivered}<span style="color:#6e6860;font-size:14px;font-weight:600"> / ${target}</span></div><div style="color:#6e6860;font-size:11px;font-weight:600">posts this cycle</div></div>
+      <div class="op-progress-row"><div class="op-nums" style="color:${hex}">${delivered}<span style="color:var(--text2);font-size:14px;font-weight:600"> / ${target}</span></div><div style="color:var(--text3);font-size:11px;font-weight:600">posts this cycle</div></div>
       <div class="op-bar-bg"><div class="op-bar-fill" style="width:${Math.min(pct||0,100)}%;background:${hex}"></div></div>
       <div class="op-footer"><span>${d.pipeline>0?'📦 '+d.pipeline+' in pipeline':'No pipeline'}</span><span>${d.stagnant?.length>0?'⚠ '+d.stagnant.length+' stagnant':'✓ Active'}</span></div>
     </div>`;
@@ -840,7 +835,7 @@ async function loadNotion(){
 
   // Debug panel
   const debugEl=document.getElementById('opsGrid');
-  debugEl.innerHTML='<div style="color:#f0ebe3;font-family:monospace;font-size:11px;grid-column:span 3" id="debugLog">🔄 Starting Notion fetch...<br></div>';
+  debugEl.innerHTML='<div style="color:var(--text);font-family:monospace;font-size:11px;grid-column:span 3" id="debugLog">🔄 Starting Notion fetch...<br></div>';
   const log=msg=>{const el=document.getElementById('debugLog');if(el)el.innerHTML+=msg+'<br>';};
 
   await Promise.allSettled(all.map(async c=>{
