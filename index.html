@@ -638,8 +638,8 @@ async function fetchNotionClient(client,isDFY){
     if(pubDate&&pubDate>=cs&&pubDate<=ce){
       if(client.dateOnly||DS.includes(status))delivered++;
     }
-    // PIPELINE = actively being worked on
-    if(status&&PIPELINE_STATUSES.includes(status))pipeline++;
+    // PIPELINE = in-progress cards with publish date in current cycle
+    if(status&&PIPELINE_STATUSES.includes(status)&&pubDate&&pubDate>=cs&&pubDate<=ce)pipeline++;
     if(pubDate&&new Date(pubDate)<now&&!DS.includes(status)&&!client.dateOnly&&status)overdue++;
     if(status&&!SK.includes(status)&&pubDate&&pubDate>=cs&&pubDate<=ce&&daysAgo(lastEdited)>=5)
       stagnant.push({name:title,status,days:daysAgo(lastEdited)});
