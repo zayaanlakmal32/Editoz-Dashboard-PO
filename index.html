@@ -400,9 +400,9 @@ const NOTION_CLIENTS = {
 };
 
 const D_ACC=['Need posting','PUBLISHED','Need Posting','Published'];
-const D_DFY=['To be published','Published','Need posting','PUBLISHED','Need Posting','Done','DL Approved','To be published by Ali','Published by Ali','Calendar','Calender'];
+const D_DFY=['To be published','Published','Need posting','PUBLISHED','Need Posting','Done','DL Approved','To be published by Ali','Published by Ali','Calendar','Calender','On trials','Evergreen Content'];
 const SK_ACC=['Topics','Need filming','Need posting','PUBLISHED','On Hold','Do Not Progress'];
-const SK_DFY=['Ideas','Ready to film','To be published','Published','Do not progress','Calendar','On Hold'];
+const SK_DFY=['Ideas','Ideas approved','Ready to write','Ready to film','To be published','Published','Do not progress','Calendar','Calender','On Hold','Done','DL Approved','On trials','Evergreen Content'];
 
 // ═══════════════════════════════════════════════════
 // STATE
@@ -642,10 +642,12 @@ async function fetchNotionClient(client,isDFY){
     if(status)breakdown[status]=(breakdown[status]||0)+1;
     // DELIVERED = delivered status AND publish date within current cycle
     if(DS.includes(status)&&pubDate&&pubDate>=cs&&pubDate<=ce)delivered++;
-    // PIPELINE = Need posting cards
-    if(status==='Need posting'||status==='Need Posting')pipeline++;
+    // PIPELINE = cards with a publish date in this cycle that aren't delivered yet
+    if(!DS.includes(status)&&pubDate&&pubDate>=cs&&pubDate<=ce)pipeline++;
     if(pubDate&&new Date(pubDate)<now&&!DS.includes(status)&&status)overdue++;
-    if(status&&!SK.includes(status)&&daysAgo(lastEdited)>=5)stagnant.push({name:title,status,days:daysAgo(lastEdited)});
+    // STAGNANT = only cards within current cycle, not in skip statuses, not edited in 5+ days
+    if(status&&!SK.includes(status)&&pubDate&&pubDate>=cs&&pubDate<=ce&&daysAgo(lastEdited)>=5)
+      stagnant.push({name:title,status,days:daysAgo(lastEdited)});
   }
   stagnant.sort((a,b)=>b.days-a.days);
   return{delivered,stagnant,breakdown,pipeline,overdue};
