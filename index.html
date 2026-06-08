@@ -385,17 +385,19 @@ const NOTION_CLIENTS = {
   dfy:[
     {name:'Robert Herjavec',po:'Joshua', dbId:'c07357ce9aa44a4d996a5a84350947b3', pubProp:'Publishing date',opTarget:30},
     {name:'Daniel Lubetzky',po:'Rovidu', dbId:'1a5b6494fc1481ad85bfc0012bd74edb', pubProp:'Publishing date',opTarget:30},
-    {name:'Kirstin Lee',    po:'Vishma', dbId:'2a5b6494fc14818bb3b1f96d633820c8', pubProp:'Publishing date',opTarget:20},
-    {name:'Arjun Paliwal',  po:'Rovidu', dbId:'24eb6494fc14811dad0df6872f10b5d8', pubProp:'Publishing date',opTarget:60},
+    {name:'Kirstin Lee',    po:'Vishma', dbId:'2a5b6494fc14818bb3b1f96d633820c8', pubProp:'Publish Date',   opTarget:20, dateOnly:true},
+    {name:'Arjun Paliwal',  po:'Rovidu', dbId:'24eb6494fc14811dad0df6872f10b5d8', pubProp:'Publish Date',   opTarget:60},
     {name:'STYT (Ali)',     po:'Vishma', dbId:'14fb6494fc148182af37ed4e7f929023', pubProp:'Publishing date',opTarget:10},
-    {name:'Lori Greiner',   po:'Sayuni', dbId:'121b6494fc1481ff964efb047f495522', pubProp:'Publishing date',opTarget:30},
-    {name:'Chali',          po:'Joshua', dbId:'7a76828bc00d4f5f81515c6636472b27', pubProp:'Publishing date',opTarget:4},
+    {name:'Lori Greiner',   po:'Sayuni', dbId:'121b6494fc1481ff964efb047f495522', pubProp:'Publishing date',opTarget:30, dateOnly:true},
+    {name:'Chali',          po:'Joshua', dbId:'7a76828bc00d4f5f81515c6636472b27', pubProp:'Publish Date',   opTarget:4},
     {name:'Davie Fogarty',  po:'Kasun',  dbId:null, manual:true,                  opTarget:6},
   ]
 };
 
 const D_ACC=['Need posting','PUBLISHED','Need Posting','Published'];
 const D_DFY=['To be published','Published','Need posting','PUBLISHED','Need Posting','Done','DL Approved','To be published by Ali','Published by Ali','Calendar','Calender','On trials','Evergreen Content'];
+// All in-progress statuses across all boards
+const PIPELINE_STATUSES=['Writing','Writing Review','Writing review','Need writing','Needs writing','Ready to write','Need filming','Ready to film','Need editing','Editing','Edit Review','Edit review','Edit Review (Internal)','Edit Review (Editoz)','Edit Review (client)','For review','For revisions','In progress','Need Revision','Need Revision','Revision','Ready to edit','Preparing the briefs'];
 const SK_ACC=['Topics','Need filming','Need posting','PUBLISHED','On Hold','Do Not Progress'];
 const SK_DFY=['Ideas','Ideas approved','Ready to write','Ready to film','To be published','Published','Do not progress','Calendar','Calender','On Hold','Done','DL Approved','On trials','Evergreen Content'];
 
@@ -632,12 +634,13 @@ async function fetchNotionClient(client,isDFY){
     const nameObj=props['Name'];
     const title=typeof nameObj==='string'?nameObj:(nameObj?.title?.[0]?.plain_text||'Untitled');
     if(status)breakdown[status]=(breakdown[status]||0)+1;
-    // DELIVERED = delivered status AND publish date within current cycle
-    if(DS.includes(status)&&pubDate&&pubDate>=cs&&pubDate<=ce)delivered++;
-    // PIPELINE = cards with a publish date in this cycle that aren't delivered yet
-    if(!DS.includes(status)&&pubDate&&pubDate>=cs&&pubDate<=ce)pipeline++;
-    if(pubDate&&new Date(pubDate)<now&&!DS.includes(status)&&status)overdue++;
-    // STAGNANT = only cards within current cycle, not in skip statuses, not edited in 5+ days
+    // DELIVERED = date in cycle AND (delivered status OR dateOnly flag)
+    if(pubDate&&pubDate>=cs&&pubDate<=ce){
+      if(client.dateOnly||DS.includes(status))delivered++;
+    }
+    // PIPELINE = actively being worked on
+    if(status&&PIPELINE_STATUSES.includes(status))pipeline++;
+    if(pubDate&&new Date(pubDate)<now&&!DS.includes(status)&&!client.dateOnly&&status)overdue++;
     if(status&&!SK.includes(status)&&pubDate&&pubDate>=cs&&pubDate<=ce&&daysAgo(lastEdited)>=5)
       stagnant.push({name:title,status,days:daysAgo(lastEdited)});
   }
