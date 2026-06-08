@@ -640,8 +640,8 @@ async function fetchNotionClient(client,isDFY){
     const nameObj=props['Name'];
     const title=typeof nameObj==='string'?nameObj:(nameObj?.title?.[0]?.plain_text||'Untitled');
     if(status)breakdown[status]=(breakdown[status]||0)+1;
-    // DELIVERED = any delivered status (Published, PUBLISHED, Need Posting, Need posting)
-    if(DS.includes(status))delivered++;
+    // DELIVERED = delivered status AND publish date within current cycle
+    if(DS.includes(status)&&pubDate&&pubDate>=cs&&pubDate<=ce)delivered++;
     // PIPELINE = Need posting cards
     if(status==='Need posting'||status==='Need Posting')pipeline++;
     if(pubDate&&new Date(pubDate)<now&&!DS.includes(status)&&status)overdue++;
