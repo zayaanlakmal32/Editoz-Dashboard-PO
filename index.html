@@ -866,6 +866,7 @@ async function loadSheets(){
     allClients=parseClients(rows);
     document.getElementById('flagCount').textContent=allClients.filter(c=>getStatus(c.status)==='red').length;
     renderOverviewKPIs();applyFilters();renderFlagsTab();renderPOKPIs();renderPOGrid();
+    renderOpsGrid(); // re-render ops to pick up manual client sheet data
   }catch(e){
     console.error(e);
     document.getElementById('clientGrid').innerHTML='<div class="notes-box" style="color:var(--red);border-color:var(--red-border);margin:20px">⚠ Error: '+e.message+'<br><br><b>Fix:</b> Open the Google Sheet → Share → "Anyone with the link can view"</div>';
