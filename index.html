@@ -700,10 +700,7 @@ function renderOpsCards(clients){
   const grid=document.getElementById('opsGrid');
   if(!clients.length){grid.innerHTML='<div style="color:var(--text3);font-size:12px;font-weight:600;padding:20px 0">No clients match.</div>';return;}
   grid.innerHTML=clients.map(c=>{
-    const d=NOTION_DATA[c.name],col=getOpsColor(c,d),hex=getOpsHex(col);
-    const delivered=d?.delivered||0,target=getOpTarget(c),pct=target>0?Math.min(Math.round((delivered/target)*100),999):null;
-    const poColor=PO_COLORS[c.po]||'#6e6860';
-    if(!d)return`<div class="op-card"><div class="op-card-header"><div><div class="op-card-name">${c.name}</div><div class="op-card-po">PO: ${c.po||'—'}</div></div></div><div class="shim" style="width:60%;margin-bottom:8px"></div><div class="shim" style="width:100%;height:6px"></div></div>`;
+    // Handle manual clients first — they use sheet data, not Notion
     if(c.manual||!c.dbId){
       const m=manualData[c.name.toLowerCase()]||{delivered:0,pipeline:0};
       const t=getOpTarget(c),pct=t>0?Math.min(Math.round((m.delivered/t)*100),999):null;
@@ -720,6 +717,10 @@ function renderOpsCards(clients){
         <div class="op-footer"><span>${m.pipeline>0?'📦 '+m.pipeline+' in pipeline':'No pipeline'}</span><span style="color:var(--text3)">Updated via sheet</span></div>
       </div>`;
     }
+    const d=NOTION_DATA[c.name],col=getOpsColor(c,d),hex=getOpsHex(col);
+    const delivered=d?.delivered||0,target=getOpTarget(c),pct=target>0?Math.min(Math.round((delivered/target)*100),999):null;
+    const poColor=PO_COLORS[c.po]||'var(--text3)';
+    if(!d)return`<div class="op-card"><div class="op-card-header"><div><div class="op-card-name">${c.name}</div><div class="op-card-po">PO: ${c.po||'—'}</div></div></div><div class="shim" style="width:60%;margin-bottom:8px"></div><div class="shim" style="width:100%;height:6px"></div></div>`;
     if(target<=0)return`<div class="op-card"><div class="op-card-header"><div><div class="op-card-name">${c.name}</div><div class="op-card-po">PO: ${c.po||'—'}</div></div><span style="font-size:10px;font-weight:700;color:var(--text3);background:var(--surface2);padding:3px 8px;border-radius:20px">TBD</span></div><div style="font-size:11px;color:var(--text3);margin-top:8px">Target not defined</div></div>`;
     return`<div class="op-card" style="border-color:${col!=='gray'?hex+'33':''}">
       <div class="op-card-header">
