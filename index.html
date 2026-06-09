@@ -829,14 +829,19 @@ let manualData={};// { clientName_lower: {delivered, pipeline} }
 
 function parseManualClients(rows){
   const map={};
-  for(let i=1;i<rows.length;i++){
-    const r=rows[i];if(!r||r.length<4)continue;
-    const name=(r[0]||'').trim();if(!name)continue;
-    map[name.toLowerCase()]={
-      delivered:parseFloat((r[3]||'0').trim())||0,
-      pipeline:parseFloat((r[4]||'0').trim())||0
-    };
+  // Find header row
+  let hi=0;
+  for(let i=0;i<Math.min(3,rows.length);i++){
+    if(rows[i].some(v=>(v||'').toLowerCase().includes('client')||v==='Client Name')){hi=i;break;}
   }
+  for(let i=hi+1;i<rows.length;i++){
+    const r=rows[i];if(!r||!r[0]||!r[0].trim())continue;
+    const name=r[0].trim();
+    const delivered=parseFloat((r[3]||'').trim())||0;
+    const pipeline=parseFloat((r[4]||'').trim())||0;
+    map[name.toLowerCase()]={delivered,pipeline};
+  }
+  console.log('Manual data loaded:',map);
   return map;
 }
 
@@ -844,7 +849,13 @@ async function loadSheets(){
   try{
     try{const r=await fetchSheetTab('Targets - DFY Clients');targetsMap=parseTargetsTab(r);}catch(e){console.warn(e.message);}
     try{const r=await fetchSheetTab('Targets - Accelerate');Object.assign(targetsMap,parseTargetsTab(r));}catch(e){console.warn(e.message);}
-    try{const r=await fetchSheetTab('Manual Clients');manualData=parseManualClients(r);}catch(e){console.warn('Manual clients:',e.message);}
+    try{
+      let mr;
+      try{mr=await fetchSheetTab('Manual Clients');}catch(_){
+        try{mr=await fetchSheetTab('Manual clients');}catch(_){}
+      }
+      if(mr)manualData=parseManualClients(mr);
+    }catch(e){console.warn('Manual clients:',e.message);}
     let rows;
     try{rows=await fetchSheetTab('PO Weekly Dashboard');}catch(e){
       try{rows=await fetchSheetTab('PO Weekly  Dashboard');}catch(_){}
