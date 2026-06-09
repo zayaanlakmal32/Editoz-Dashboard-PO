@@ -704,7 +704,22 @@ function renderOpsCards(clients){
     const delivered=d?.delivered||0,target=getOpTarget(c),pct=target>0?Math.min(Math.round((delivered/target)*100),999):null;
     const poColor=PO_COLORS[c.po]||'#6e6860';
     if(!d)return`<div class="op-card"><div class="op-card-header"><div><div class="op-card-name">${c.name}</div><div class="op-card-po">PO: ${c.po||'—'}</div></div></div><div class="shim" style="width:60%;margin-bottom:8px"></div><div class="shim" style="width:100%;height:6px"></div></div>`;
-    if(c.manual||!c.dbId)return`<div class="op-card"><div class="op-card-header"><div><div class="op-card-name">${c.name}</div><div class="op-card-po">PO: ${c.po||'—'}</div></div><span style="font-size:10px;font-weight:700;color:var(--text3);background:var(--surface2);padding:3px 8px;border-radius:20px">Manual</span></div><div style="font-size:11px;color:var(--text3);margin-top:8px">Tracked manually</div></div>`;
+    if(c.manual||!c.dbId){
+      const m=manualData[c.name.toLowerCase()]||{delivered:0,pipeline:0};
+      const t=getOpTarget(c),pct=t>0?Math.min(Math.round((m.delivered/t)*100),999):null;
+      const col=t>0?(pct>=90?'green':pct>=50?'yellow':'red'):'gray';
+      const hex=getOpsHex(col);
+      const poColor=PO_COLORS[c.po]||'var(--text3)';
+      return`<div class="op-card" style="border-color:${col!=='gray'?hex+'33':''}">
+        <div class="op-card-header">
+          <div><div class="op-card-name">${c.name}</div><div class="op-card-po" style="color:${poColor}">PO: ${c.po||'—'} <span style="color:var(--text3)">· ${OPS_TAB==='dfy'?'DFY':'ACC'}</span></div></div>
+          ${pct!==null?`<span style="font-size:11px;font-weight:800;padding:4px 10px;border-radius:20px;background:${hex}18;color:${hex}">${pct}%</span>`:'<span style="font-size:10px;font-weight:700;color:var(--text3);background:var(--surface2);padding:3px 8px;border-radius:20px">Manual</span>'}
+        </div>
+        <div class="op-progress-row"><div class="op-nums" style="color:${hex}">${m.delivered}<span style="color:var(--text3);font-size:14px;font-weight:600"> / ${t}</span></div><div style="color:var(--text3);font-size:11px;font-weight:600">posts this cycle</div></div>
+        <div class="op-bar-bg"><div class="op-bar-fill" style="width:${Math.min(pct||0,100)}%;background:${hex}"></div></div>
+        <div class="op-footer"><span>${m.pipeline>0?'📦 '+m.pipeline+' in pipeline':'No pipeline'}</span><span style="color:var(--text3)">Updated via sheet</span></div>
+      </div>`;
+    }
     if(target<=0)return`<div class="op-card"><div class="op-card-header"><div><div class="op-card-name">${c.name}</div><div class="op-card-po">PO: ${c.po||'—'}</div></div><span style="font-size:10px;font-weight:700;color:var(--text3);background:var(--surface2);padding:3px 8px;border-radius:20px">TBD</span></div><div style="font-size:11px;color:var(--text3);margin-top:8px">Target not defined</div></div>`;
     return`<div class="op-card" style="border-color:${col!=='gray'?hex+'33':''}">
       <div class="op-card-header">
@@ -810,10 +825,26 @@ function switchInnerTab(tab,el){
 // ═══════════════════════════════════════════════════
 // LOAD
 // ═══════════════════════════════════════════════════
+let manualData={};// { clientName_lower: {delivered, pipeline} }
+
+function parseManualClients(rows){
+  const map={};
+  for(let i=1;i<rows.length;i++){
+    const r=rows[i];if(!r||r.length<4)continue;
+    const name=(r[0]||'').trim();if(!name)continue;
+    map[name.toLowerCase()]={
+      delivered:parseFloat((r[3]||'0').trim())||0,
+      pipeline:parseFloat((r[4]||'0').trim())||0
+    };
+  }
+  return map;
+}
+
 async function loadSheets(){
   try{
     try{const r=await fetchSheetTab('Targets - DFY Clients');targetsMap=parseTargetsTab(r);}catch(e){console.warn(e.message);}
     try{const r=await fetchSheetTab('Targets - Accelerate');Object.assign(targetsMap,parseTargetsTab(r));}catch(e){console.warn(e.message);}
+    try{const r=await fetchSheetTab('Manual Clients');manualData=parseManualClients(r);}catch(e){console.warn('Manual clients:',e.message);}
     let rows;
     try{rows=await fetchSheetTab('PO Weekly Dashboard');}catch(e){
       try{rows=await fetchSheetTab('PO Weekly  Dashboard');}catch(_){}
@@ -846,7 +877,7 @@ async function loadNotion(){
 
 async function refreshAll(){
   document.getElementById('lastUpdated').textContent='Loading…';
-  allClients=[];NOTION_DATA={};targetsMap={};
+  allClients=[];NOTION_DATA={};targetsMap={};manualData={};
   await Promise.all([loadSheets(),loadNotion()]);
   document.getElementById('lastUpdated').textContent='Updated '+new Date().toLocaleTimeString()+' · '+new Date().toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
 }
