@@ -680,18 +680,26 @@ function applyOpsFilters(){
   renderOpsCards(clients);
 }
 function renderOpsKPIs(){
-  const clients=NOTION_CLIENTS[OPS_TAB];
-  const wd=clients.filter(c=>NOTION_DATA[c.name]&&!NOTION_DATA[c.name].manual&&getOpTarget(c)>0);
-  const onTarget=wd.filter(c=>getOpsColor(c,NOTION_DATA[c.name])==='green').length;
-  const behind=wd.filter(c=>getOpsColor(c,NOTION_DATA[c.name])==='red').length;
-  const del=wd.reduce((s,c)=>s+(NOTION_DATA[c.name]?.delivered||0),0);
-  const tgt=wd.reduce((s,c)=>s+getOpTarget(c),0);
+  // KPIs always show combined Accelerate + DFY
+  const allClients=[...NOTION_CLIENTS.accelerate,...NOTION_CLIENTS.dfy];
+  const tabClients=NOTION_CLIENTS[OPS_TAB];
+
+  // Combined numbers for KPIs
+  const allWd=allClients.filter(c=>{
+    if(c.manual)return manualData[c.name.toLowerCase()]!==undefined&&getOpTarget(c)>0;
+    return NOTION_DATA[c.name]&&getOpTarget(c)>0;
+  });
+  const onTarget=allWd.filter(c=>getOpsColor(c,c.manual?{delivered:(manualData[c.name.toLowerCase()]||{}).delivered||0}:NOTION_DATA[c.name])==='green').length;
+  const behind=allWd.filter(c=>getOpsColor(c,c.manual?{delivered:(manualData[c.name.toLowerCase()]||{}).delivered||0}:NOTION_DATA[c.name])==='red').length;
+  const del=allWd.reduce((s,c)=>s+(c.manual?(manualData[c.name.toLowerCase()]||{}).delivered||0:NOTION_DATA[c.name]?.delivered||0),0);
+  const tgt=allWd.reduce((s,c)=>s+getOpTarget(c),0);
   const avg=tgt>0?Math.round((del/tgt)*100):0;
+
   document.getElementById('opsKPIs').innerHTML=
-    `<div class="dark-kpi" style="--dk-color:var(--blue)"><div class="dark-kpi-label">Total Clients</div><div class="dark-kpi-val">${clients.length}</div><div class="dark-kpi-sub">${clients.filter(c=>getOpTarget(c)>0).length} with targets</div></div>`+
+    `<div class="dark-kpi" style="--dk-color:var(--blue)"><div class="dark-kpi-label">Total Clients</div><div class="dark-kpi-val">${allClients.length}</div><div class="dark-kpi-sub">${NOTION_CLIENTS.accelerate.length} ACC · ${NOTION_CLIENTS.dfy.length} DFY</div></div>`+
     `<div class="dark-kpi" style="--dk-color:var(--green)"><div class="dark-kpi-label">On Target</div><div class="dark-kpi-val">${onTarget}</div><div class="dark-kpi-sub">≥90% of goal</div></div>`+
     `<div class="dark-kpi" style="--dk-color:var(--red)"><div class="dark-kpi-label">Behind</div><div class="dark-kpi-val">${behind}</div><div class="dark-kpi-sub"><50% of goal</div></div>`+
-    `<div class="dark-kpi" style="--dk-color:var(--yellow)"><div class="dark-kpi-label">Overall Output</div><div class="dark-kpi-val">${avg}%</div><div class="dark-kpi-sub">${del} of ${tgt} posts</div></div>`;
+    `<div class="dark-kpi" style="--dk-color:var(--yellow)"><div class="dark-kpi-label">Overall Output</div><div class="dark-kpi-val">${avg}%</div><div class="dark-kpi-sub">${del} of ${tgt} posts · all clients</div></div>`;
 }
 function renderOpsGrid(){renderOpsKPIs();applyOpsFilters();}
 function renderOpsCards(clients){
