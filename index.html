@@ -432,8 +432,8 @@ function parseTargetsTab(rows){
 function detectColumns(h){
   const hl=h.map(v=>(v||'').toLowerCase().trim());
   const f=(...k)=>{for(const k2 of k){const i=hl.findIndex(v=>v.includes(k2));if(i!==-1)return i;}return -1;};
-  // Issue category dropdown has a header ending in * (e.g. "Key Issues*")
-  const issueCategoryIdx=h.findIndex(v=>(v||'').trim().endsWith('*')&&(v||'').toLowerCase().includes('issue'));
+  // Issue category dropdown has a header containing '*' and 'issue'
+  const issueCategoryIdx=h.findIndex(v=>(v||'').includes('*')&&(v||'').toLowerCase().includes('issue'));
   let keyIssuesIdx=f('key issue','issue','problem','challenge');
   if(keyIssuesIdx===issueCategoryIdx){
     // find the next column matching after the issue category
