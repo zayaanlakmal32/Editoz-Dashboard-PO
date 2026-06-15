@@ -430,9 +430,16 @@ function parseTargetsTab(rows){
   return map;
 }
 function detectColumns(h){
-  h=h.map(v=>(v||'').toLowerCase().trim());
-  const f=(...k)=>{for(const k2 of k){const i=h.findIndex(v=>v.includes(k2));if(i!==-1)return i;}return -1;};
-  return{project:f('project','type'),pod:f('pod'),po:f('product owner','po','owner'),metric:f('monthly goal metric','metric','goal type','kpi'),goalVal:f('value','target'),actual:f('actual status','actual','current','achieved','progress'),status:f('status 🔴','status'),keyIssues:f('key issue','issue','problem','challenge'),actionPlan:f('weekly action','action','plan','next step')};
+  const hl=h.map(v=>(v||'').toLowerCase().trim());
+  const f=(...k)=>{for(const k2 of k){const i=hl.findIndex(v=>v.includes(k2));if(i!==-1)return i;}return -1;};
+  // Issue category dropdown has a header ending in * (e.g. "Key Issues*")
+  const issueCategoryIdx=h.findIndex(v=>(v||'').trim().endsWith('*')&&(v||'').toLowerCase().includes('issue'));
+  let keyIssuesIdx=f('key issue','issue','problem','challenge');
+  if(keyIssuesIdx===issueCategoryIdx){
+    // find the next column matching after the issue category
+    keyIssuesIdx=hl.findIndex((v,idx)=>idx>issueCategoryIdx&&(v.includes('key issue')||v.includes('issue')||v.includes('problem')||v.includes('challenge')));
+  }
+  return{project:f('project','type'),pod:f('pod'),po:f('product owner','po','owner'),metric:f('monthly goal metric','metric','goal type','kpi'),goalVal:f('value','target'),actual:f('actual status','actual','current','achieved','progress'),status:f('status 🔴','status'),issueCategory:issueCategoryIdx,keyIssues:keyIssuesIdx,actionPlan:f('weekly action','action','plan','next step')};
 }
 function parseClients(rows){
   if(!rows||rows.length<2)return[];
@@ -446,13 +453,14 @@ function parseClients(rows){
     const metric=get(r,cols.metric,4),goalVal=get(r,cols.goalVal,5);
     const actual=get(r,cols.actual!==-1?cols.actual:6,6),status=get(r,cols.status,7);
     const keyIssues=get(r,cols.keyIssues,8),actionPlan=get(r,cols.actionPlan,9);
+    const issueCategory=cols.issueCategory!==-1?get(r,cols.issueCategory,-1):'';
     if(!name||name==='Client')continue;if(project==='Project'||project==='Type')continue;
     let pct=null,aNum=parseNum(actual),gNum=parseNum(goalVal);
     const tk=name.toLowerCase();
     if((isNaN(aNum)||isNaN(gNum)||gNum===0)&&targetsMap[tk]){const t=targetsMap[tk];if(!isNaN(t.currentNum)&&!isNaN(t.goalNum)&&t.goalNum>0){aNum=t.currentNum;gNum=t.goalNum;}}
     if(!isNaN(aNum)&&!isNaN(gNum)&&gNum>0)pct=Math.min((aNum/gNum)*100,100);
     const targ=targetsMap[tk];
-    clients.push({project:project||'DFY',name,pod,po,metric:metric||(targ?targ.metric:''),goalVal:goalVal||(targ?targ.goalVal:''),actual:actual||(targ?targ.currentProgress:''),status,keyIssues,actionPlan,pct});
+    clients.push({project:project||'DFY',name,pod,po,metric:metric||(targ?targ.metric:''),goalVal:goalVal||(targ?targ.goalVal:''),actual:actual||(targ?targ.currentProgress:''),status,keyIssues,issueCategory,actionPlan,pct});
   }
   return clients;
 }
@@ -514,12 +522,14 @@ function clientCard(c){
   const st=getStatus(c.status),tc=c.project==='DFY'?'dfy':'acc',bc=st==='red'?'flag-red':st==='yellow'?'flag-yellow':'';
   const pb=c.pct!==null?'<div class="client-progress-wrap"><div class="client-progress-header"><span class="client-actual">'+c.actual+'</span><span style="color:'+progressColor(c.pct)+';font-weight:700">'+c.pct.toFixed(0)+'%</span></div><div class="progress-track"><div class="progress-fill" style="width:'+c.pct.toFixed(1)+'%;background:'+progressColor(c.pct)+'"></div></div></div>':(c.actual?'<div style="font-size:11px;color:var(--text2);margin-top:4px;font-weight:500">Current: '+c.actual+'</div>':'');
   const pod=c.pod?'<span style="font-size:9px;background:var(--purple-dim);color:var(--purple);border:1px solid #d8b4fe;border-radius:4px;padding:1px 6px;font-weight:600">'+c.pod.replace('POD - ','')+'</span>':'';
+  const issueChip=c.issueCategory?'<span style="font-size:9px;background:var(--red-dim);color:var(--red);border:1px solid var(--red-border);border-radius:4px;padding:2px 7px;font-weight:600;display:inline-block;margin-top:6px">⚠ '+c.issueCategory+'</span>':'';
   return'<div class="client-card '+bc+'">'+
     '<div class="client-header"><div style="display:flex;align-items:center;gap:5px;flex-wrap:wrap"><div class="client-name">'+c.name+'</div></div>'+
     '<div style="display:flex;align-items:center;gap:4px">'+(c.status?'<span style="font-size:13px">'+c.status+'</span>':'')+
     '<span class="client-type '+tc+'">'+c.project+'</span></div></div>'+
     '<div class="client-po" style="display:flex;align-items:center;gap:5px;flex-wrap:wrap">'+pod+'<span>PO: '+(c.po||'—')+'</span></div>'+
     (c.metric?'<div class="client-goal"><span style="color:var(--text3);font-size:10px">Goal:</span> '+c.metric+' <b style="color:var(--text)">'+(c.goalVal||'—')+'</b></div>':'')+pb+
+    issueChip+
     (c.keyIssues?'<div class="notes-box">'+c.keyIssues.substring(0,150)+(c.keyIssues.length>150?'...':'')+'</div>':'')+
     '</div>';
 }
@@ -537,9 +547,10 @@ function renderFlagsTab(){
     '</div>';
   const atRisk=allClients.filter(c=>getStatus(c.status)==='red'||getStatus(c.status)==='yellow');
   document.getElementById('flagTable').innerHTML=atRisk.length
-    ?'<table class="data-table"><thead><tr><th>Client</th><th>POD</th><th>PO</th><th>Type</th><th>Status</th><th>Goal Progress</th><th>Key Issue</th></tr></thead><tbody>'+
+    ?'<table class="data-table"><thead><tr><th>Client</th><th>POD</th><th>PO</th><th>Type</th><th>Status</th><th>Goal Progress</th><th>Issue Category</th><th>Key Issue</th></tr></thead><tbody>'+
       atRisk.map(c=>{const prog=c.pct!==null?'<div style="display:flex;align-items:center;gap:6px"><div class="progress-track" style="width:70px"><div class="progress-fill" style="width:'+c.pct.toFixed(0)+'%;background:'+progressColor(c.pct)+'"></div></div><span style="color:'+progressColor(c.pct)+';font-weight:700">'+c.pct.toFixed(0)+'%</span></div>':'<span style="color:var(--text3)">'+(c.actual||'—')+'</span>';
-        return'<tr><td><div class="td-main">'+c.name+'</div></td><td><span style="font-size:10px;font-weight:600;color:var(--purple)">'+(c.pod?c.pod.replace('POD - ',''):'—')+'</span></td><td><span class="td-po">'+(c.po||'—')+'</span></td><td><span class="client-type '+(c.project==='DFY'?'dfy':'acc')+'">'+c.project+'</span></td><td>'+(c.status||'—')+'</td><td>'+prog+'</td><td style="max-width:200px;color:var(--text3);font-size:10px;line-height:1.5">'+(c.keyIssues||'—').substring(0,160)+'</td></tr>';
+        const issueTag=c.issueCategory?'<span style="font-size:9px;background:var(--red-dim);color:var(--red);border:1px solid var(--red-border);border-radius:4px;padding:2px 7px;font-weight:600;white-space:nowrap">'+c.issueCategory+'</span>':'<span style="color:var(--text3)">—</span>';
+        return'<tr><td><div class="td-main">'+c.name+'</div></td><td><span style="font-size:10px;font-weight:600;color:var(--purple)">'+(c.pod?c.pod.replace('POD - ',''):'—')+'</span></td><td><span class="td-po">'+(c.po||'—')+'</span></td><td><span class="client-type '+(c.project==='DFY'?'dfy':'acc')+'">'+c.project+'</span></td><td>'+(c.status||'—')+'</td><td>'+prog+'</td><td>'+issueTag+'</td><td style="max-width:200px;color:var(--text3);font-size:10px;line-height:1.5">'+(c.keyIssues||'—').substring(0,160)+'</td></tr>';
       }).join('')+'</tbody></table>'
     :'<div class="empty" style="padding:30px;text-align:center;color:var(--green)">✓ No at-risk clients this week</div>';
   const pos=[...new Set(allClients.map(c=>c.po).filter(Boolean))].sort();
