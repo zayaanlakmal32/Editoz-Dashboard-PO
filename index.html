@@ -709,7 +709,15 @@ function renderOpsKPIs(){
     `<div class="dark-kpi" style="--dk-color:var(--yellow)"><div class="dark-kpi-label">Overall Output</div><div class="dark-kpi-val">${avg}%</div><div class="dark-kpi-sub">${del} of ${tgt} posts · all clients</div></div>`;
 }
 function getIssueCategory(c){
-  const match=allClients.find(x=>x.name.toLowerCase()===c.name.toLowerCase());
+  const cName=c.name.toLowerCase().trim();
+  // exact match first
+  let match=allClients.find(x=>x.name.toLowerCase().trim()===cName);
+  if(match?.issueCategory)return match.issueCategory;
+  // fuzzy match — sheet name is contained in client name or vice versa
+  match=allClients.find(x=>{
+    const xName=x.name.toLowerCase().trim();
+    return xName&&(cName.includes(xName)||xName.includes(cName));
+  });
   return match?.issueCategory||'';
 }
 function issueTagHtml(issueCategory){
